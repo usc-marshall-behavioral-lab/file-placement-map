@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MBRL — File Placement Map</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --onedrive: #0078d4;
+  --onedrive-light: #e8f4fd;
+  --onedrive-mid: #cce4f7;
+  --teams: #6264a7;
+  --teams-light: #edeef8;
+  --teams-mid: #d5d6ec;
+  --sharepoint: #038387;
+  --sharepoint-light: #e6f5f5;
+  --sharepoint-mid: #c2e8e8;
+  --bg: #f7f8fa;
+  --surface: #ffffff;
+  --text: #1a1a2e;
+  --text-muted: #5a5a7a;
+  --text-light: #8a8aa0;
+  --border: #e4e6ee;
+  --danger: #d13438;
+  --warning: #ff8c00;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── HEADER ── */
+.header {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%);
+  color: white;
+  padding: 3rem 2rem 2.5rem;
+  position: relative;
+  overflow: hidden;
+}
+.header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(0,120,212,0.15) 0%, transparent 70%);
+  border-radius: 50%;
+}
+.header::after {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  left: 20%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(3,131,135,0.12) 0%, transparent 70%);
+  border-radius: 50%;
+}
+.header-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+.header h1 {
+  font-family: 'Fraunces', serif;
+  font-size: 2.4rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.5px;
+}
+.header p {
+  font-size: 1.05rem;
+  opacity: 0.8;
+  max-width: 700px;
+  line-height: 1.7;
+}
+.badge-row {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+  flex-wrap: wrap;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+.badge.od { background: rgba(0,120,212,0.25); color: #7dc4ff; }
+.badge.tf { background: rgba(98,100,167,0.25); color: #b8b9e0; }
+.badge.sp { background: rgba(3,131,135,0.25); color: #6dd5d8; }
+.badge .dot {
+  width: 8px; height: 8px; border-radius: 50%;
+}
+.badge.od .dot { background: var(--onedrive); }
+.badge.tf .dot { background: var(--teams); }
+.badge.sp .dot { background: var(--sharepoint); }
+
+/* ── DECISION TREE ── */
+.decision-section {
+  max-width: 1400px;
+  margin: 2.5rem auto 0;
+  padding: 0 2rem;
+}
+.section-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-light);
+  margin-bottom: 0.75rem;
+}
+.decision-tree {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.decision-flow {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+}
+.decision-q {
+  flex: 1;
+  text-align: center;
+  padding: 1.25rem 1rem;
+  position: relative;
+}
+.decision-q:not(:last-child)::after {
+  content: '→';
+  position: absolute;
+  right: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.4rem;
+  color: var(--text-light);
+  z-index: 2;
+}
+.dq-question {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.6rem;
+}
+.dq-answer {
+  font-size: 0.78rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  font-weight: 600;
+  display: inline-block;
+}
+.dq-answer.yes { color: #0a7c3e; background: #e6f5ec; }
+.dq-answer.no { color: #8a4b08; background: #fff4e6; }
+.dq-dest {
+  margin-top: 0.5rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px;
+  display: inline-block;
+}
+.dq-dest.od { background: var(--onedrive-light); color: var(--onedrive); }
+.dq-dest.tf { background: var(--teams-light); color: var(--teams); }
+.dq-dest.sp { background: var(--sharepoint-light); color: var(--sharepoint); }
+
+.decision-subtitle {
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  border-top: 1px dashed var(--border);
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+/* ── THREE COLUMN MAP ── */
+.map-section {
+  max-width: 1400px;
+  margin: 2.5rem auto 0;
+  padding: 0 2rem;
+}
+.three-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1.25rem;
+  margin-top: 0.75rem;
+}
+.col-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: box-shadow 0.2s;
+}
+.col-panel:hover {
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+}
+.col-header {
+  padding: 1.25rem 1.25rem 1rem;
+  color: white;
+  position: relative;
+}
+.col-header.od { background: linear-gradient(135deg, var(--onedrive), #005a9e); }
+.col-header.tf { background: linear-gradient(135deg, var(--teams), #464775); }
+.col-header.sp { background: linear-gradient(135deg, var(--sharepoint), #025c5e); }
+.col-header h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+.col-header .col-icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.25rem;
+}
+.col-header .col-subtitle {
+  font-size: 0.78rem;
+  opacity: 0.85;
+  margin-top: 0.25rem;
+}
+.col-body {
+  padding: 0.75rem 1.25rem 1.25rem;
+}
+
+/* Folder groups */
+.folder-group {
+  margin-bottom: 0.25rem;
+  border-bottom: 1px solid var(--border);
+}
+.folder-group:last-child { border-bottom: none; }
+.folder-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 0;
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 0.15s;
+}
+.folder-header:hover { opacity: 0.75; }
+.folder-icon { font-size: 1rem; }
+.folder-name {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.folder-count {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-light);
+  background: var(--bg);
+  padding: 0.15rem 0.5rem;
+  border-radius: 10px;
+}
+.folder-chevron {
+  font-size: 0.7rem;
+  color: var(--text-light);
+  transition: transform 0.2s;
+}
+.folder-group.open .folder-chevron { transform: rotate(90deg); }
+.folder-files {
+  display: none;
+  padding: 0 0 0.75rem 1.75rem;
+}
+.folder-group.open .folder-files { display: block; }
+
+.file-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  padding: 0.3rem 0;
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+.file-item .file-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+  font-size: 0.7rem;
+}
+.file-item .file-name {
+  font-weight: 600;
+  color: var(--text);
+}
+.file-item .file-desc {
+  color: var(--text-muted);
+}
+
+/* Migration arrow tags */
+.migrate-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  margin-left: 0.35rem;
+  vertical-align: middle;
+}
+.migrate-tag.to-sp { background: var(--sharepoint-light); color: var(--sharepoint); }
+.migrate-tag.to-tf { background: var(--teams-light); color: var(--teams); }
+.migrate-tag.to-od { background: var(--onedrive-light); color: var(--onedrive); }
+.migrate-tag.to-outlook { background: #fff4e6; color: #8a4b08; }
+
+/* ── RULES STRIP ── */
+.rules-section {
+  max-width: 1400px;
+  margin: 2.5rem auto 0;
+  padding: 0 2rem;
+}
+.rules-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+.rule-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  position: relative;
+  overflow: hidden;
+}
+.rule-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 4px; height: 100%;
+}
+.rule-card.r-od::before { background: var(--onedrive); }
+.rule-card.r-tf::before { background: var(--teams); }
+.rule-card.r-sp::before { background: var(--sharepoint); }
+.rule-card.r-all::before { background: linear-gradient(180deg, var(--onedrive), var(--teams), var(--sharepoint)); }
+.rule-number {
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-light);
+  margin-bottom: 0.35rem;
+}
+.rule-title {
+  font-weight: 700;
+  font-size: 0.88rem;
+  margin-bottom: 0.35rem;
+}
+.rule-desc {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+/* ── MIGRATION FLOW ── */
+.migration-section {
+  max-width: 1400px;
+  margin: 2.5rem auto 0;
+  padding: 0 2rem;
+}
+.migration-table {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-top: 0.75rem;
+  border-collapse: collapse;
+}
+.migration-table th {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 0.85rem 1rem;
+  text-align: left;
+  background: var(--bg);
+  border-bottom: 2px solid var(--border);
+  color: var(--text-muted);
+}
+.migration-table td {
+  font-size: 0.8rem;
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+.migration-table tr:last-child td { border-bottom: none; }
+.migration-table .arrow-cell {
+  text-align: center;
+  color: var(--text-light);
+  font-size: 1.1rem;
+}
+.origin-badge, .dest-badge {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+.origin-badge.od, .dest-badge.od { background: var(--onedrive-light); color: var(--onedrive); }
+.origin-badge.tf, .dest-badge.tf { background: var(--teams-light); color: var(--teams); }
+.origin-badge.sp, .dest-badge.sp { background: var(--sharepoint-light); color: var(--sharepoint); }
+.dest-badge.out { background: #fff4e6; color: #8a4b08; }
+
+/* ── CHEAT SHEET ── */
+.cheat-section {
+  max-width: 1400px;
+  margin: 2.5rem auto 3rem;
+  padding: 0 2rem;
+}
+.cheat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-top: 0.75rem;
+}
+.cheat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+.cheat-card h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.05rem;
+  margin-bottom: 0.75rem;
+}
+.cheat-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.4rem 0;
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+.cheat-icon { flex-shrink: 0; font-size: 0.85rem; margin-top: 1px; }
+.cheat-text { color: var(--text-muted); }
+.cheat-text strong { color: var(--text); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1024px) {
+  .three-col { grid-template-columns: 1fr; }
+  .rules-grid { grid-template-columns: 1fr; }
+  .cheat-grid { grid-template-columns: 1fr; }
+  .decision-flow { flex-direction: column; }
+  .decision-q:not(:last-child)::after {
+    content: '↓';
+    right: 50%;
+    top: auto;
+    bottom: -8px;
+    transform: translateX(50%);
+  }
+}
+@media (max-width: 768px) {
+  .header { padding: 2rem 1.25rem; }
+  .header h1 { font-size: 1.8rem; }
+  .map-section, .rules-section, .migration-section, .cheat-section, .decision-section { padding: 0 1.25rem; }
+  .migration-table { font-size: 0.75rem; display: block; overflow-x: auto; }
+}
+
+/* Print */
+@media print {
+  .folder-files { display: block !important; }
+  .folder-chevron { display: none; }
+  body { background: white; }
+  .header { background: #1a1a2e !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
+/* Global Site Navigation */
+.global-nav {
+  background: #1a1a2e;
+  border-bottom: 2px solid #990000;
+  padding: 0;
+  position: sticky;
+  top: 0;
+  z-index: 1100;
+}
+.global-nav-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  height: 40px;
+}
+.global-nav-label {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: rgba(255,255,255,0.5);
+}
+.global-nav-links {
+  display: flex;
+  gap: 0;
+  height: 100%;
+}
+.global-nav-link {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.7);
+  text-decoration: none;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+  margin-bottom: -2px;
+}
+.global-nav-link:hover {
+  color: #fff;
+  background: rgba(255,255,255,0.05);
+}
+.global-nav-link.active {
+  color: #fff;
+  font-weight: 600;
+  border-bottom-color: #FFCC00;
+}
+.global-nav-link.back-link {
+  color: rgba(255,255,255,0.5);
+  font-size: 11px;
+  padding-left: 0;
+  margin-right: 8px;
+}
+.global-nav-link.back-link:hover {
+  color: #FFCC00;
+}
+@media (max-width: 768px) {
+  .global-nav-inner { flex-direction: column; height: auto; padding: 8px 16px; gap: 4px; }
+  .global-nav-label { display: none; }
+  .global-nav-links { width: 100%; justify-content: center; }
+  .global-nav-link { font-size: 11px; padding: 6px 10px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Global Site Navigation -->
+<div class="global-nav">
+  <div class="global-nav-inner">
+    <div class="global-nav-label">MBRL Operations</div>
+    <div class="global-nav-links">
+      <a href="https://usc-marshall-behavioral-lab.github.io/operations-workflow-hub" class="global-nav-link back-link">← Operations Hub</a>
+      <a href="https://usc-marshall-behavioral-lab.github.io/operations-workflow-hub" class="global-nav-link">Workflow Hub</a>
+      <a href="https://usc-marshall-behavioral-lab.github.io/m365-ecosystem-guide" class="global-nav-link">M365 Ecosystem Guide</a>
+      <a href="https://usc-marshall-behavioral-lab.github.io/file-placement-hub" class="global-nav-link active">File Placement Map</a>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ HEADER ════════════════ -->
+<header class="header">
+  <div class="header-inner">
+    <h1>MBRL File Placement Map</h1>
+    <p>Where every file lives — and why. A three-lane guide for OneDrive, Teams Files, and SharePoint across all MBRL operations.</p>
+    <div class="badge-row">
+      <span class="badge od"><span class="dot"></span>OneDrive — Your Workbench</span>
+      <span class="badge tf"><span class="dot"></span>Teams Files — Shared Operations</span>
+      <span class="badge sp"><span class="dot"></span>SharePoint — Published Reference</span>
+    </div>
+  </div>
+</header>
+
+<!-- ════════════════ DECISION TREE ════════════════ -->
+<section class="decision-section">
+  <div class="section-label">Decision Tree — Where Does This File Go?</div>
+  <div class="decision-tree">
+    <div class="decision-flow">
+      <div class="decision-q">
+        <div class="dq-question">Am I the only one who needs this right now?</div>
+        <div class="dq-answer yes">Yes →</div>
+        <br><div class="dq-dest od">📁 OneDrive</div>
+      </div>
+      <div class="decision-q">
+        <div class="dq-question">Does the team need to edit or use this daily?</div>
+        <div class="dq-answer yes">Yes →</div>
+        <br><div class="dq-dest tf">📂 Teams Files</div>
+      </div>
+      <div class="decision-q">
+        <div class="dq-question">Is this a finalized SOP, guide, or reference?</div>
+        <div class="dq-answer yes">Yes →</div>
+        <br><div class="dq-dest sp">📚 SharePoint Wiki</div>
+      </div>
+    </div>
+    <div class="decision-subtitle">When uncertain, consider: "Would a colleague need this file to perform their duties in my absence?" If yes → Teams Files or SharePoint. If no → OneDrive.</div>
+    <div style="margin-top:12px;padding:12px 16px;background:linear-gradient(135deg,#f0f4ff,#e8eeff);border:1px solid #c5d3f0;border-radius:8px;display:flex;align-items:center;justify-content:space-between;max-width:800px;">
+      <div style="font-size:11px;color:#6B6B6B;">Need to understand platform roles, audience boundaries, or permissions? See the <a href="https://usc-marshall-behavioral-lab.github.io/m365-ecosystem-guide" style="color:#1A4B7A;font-weight:600;text-decoration:none;">M365 Ecosystem Guide →</a></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ THREE COLUMN MAP ════════════════ -->
+<section class="map-section">
+  <div class="section-label">File Placement Map — Every File, One Home</div>
+  <div class="three-col">
+
+    <!-- ───── ONEDRIVE COLUMN ───── -->
+    <div class="col-panel">
+      <div class="col-header od">
+        <div class="col-icon">☁️</div>
+        <h2>OneDrive</h2>
+        <div class="col-subtitle">Lab Manager's Private Workbench</div>
+      </div>
+      <div class="col-body">
+
+        <div class="folder-group open">
+          <div class="folder-header" onclick="toggleFolder(this)">
+            <span class="folder-icon">💰</span>
+            <span class="folder-name">01 — Budget & Finance</span>
+            <span class="folder-count">7</span>
+            <span class="folder-chevron">▶</span>
+          </div>
+          <div class="folder-files">
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">FY26 Operating Plan (Final)</span> <span class="migrate-tag to-outlook">→ shared via link</span><br><span class="file-desc">PG1006250 — finalized plan shared with Peer Fiss</span></div></div>
+            <div class="file-item"><span class="file-icon">📝</span><div><span class="file-name">FY27 Operating Plan (DRAFT)</span><br><span class="file-desc">In-progress budget for next fiscal year</span></div></div>
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">FY26 Expense Tracker</span><br><span class="file-desc">Running spreadsheet of all lab expenses</span></div></div>
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">Historical Comparison FY17–FY26</span><br><span class="file-desc">883% growth documentation, multi-year trends</span></div></div>
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">PAA Wage Transfer Workbook</span><br><span class="file-desc">Monthly ServiceNow file for Josie Acosta — PG1006250 charges</span></div></div>
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">Compensation Log FY26</span><br><span class="file-desc">Tremendous + Amazon gift card tracking</span></div></div>
+            <div class="file-item"><span class="file-icon">📝</span><div><span class="file-name">FY27 Budget Request (DRAFT)</span><br><span class="file-desc">November deadline cycle prep</span></div></div>
+          </div>
+        </div>
+
+        <div class="folder-group">
+          <div class="folder-header" onclick="toggleFolder(this)">
+            <span class="folder-icon">📑</span>
+            <span class="folder-name">02 — Annual Report</span>
+            <span class="folder-count">4</span>
+            <span class="folder-chevron">▶</span>
+          </div>
+          <div class="folder-files">
+            <div class="file-item"><span class="file-icon">📝</span><div><span class="file-name">Annual Report FY25 (DRAFT v#)</span><br><span class="file-desc">Iterative drafts — Lab Manager workspace</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">Annual Report FY25 (Final PDF)</span> <span class="migrate-tag to-sp">→ SharePoint</span> <span class="migrate-tag to-outlook">→ External Relations</span><br><span class="file-desc">Final version published out when ready</span></div></div>
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">Supporting Data Workbook</span><br><span class="file-desc">Raw metrics feeding the report</span></div></div>
+            <div class="file-item"><span class="file-icon">📁</span><div><span class="file-name">Visuals/ subfolder</span><br><span class="file-desc">Charts, graphics, infographics for report</span></div></div>
+          </div>
+        </div>
+
+        <div class="folder-group">
+          <div class="folder-header" onclick="toggleFolder(this)">
+            <span class="folder-icon">📈</span>
+            <span class="folder-name">03 — Performance & KPIs</span>
+            <span class="folder-count">5</span>
+            <span class="folder-chevron">▶</span>
+          </div>
+          <div class="folder-files">
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">KPI Dashboard FY25</span> <span class="migrate-tag to-outlook">→ shared via link</span><br><span class="file-desc">Shared with Peer Fiss when ready for review</span></div></div>
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">Participant Metrics FY17–FY25</span><br><span class="file-desc">Raw participant volume data, multi-year</span></div></div>
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">Student Hours Metrics FY17–FY25</span><br><span class="file-desc">Raw student hours data, multi-year</span></div></div>
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">Operations Metrics FY25</span><br><span class="file-desc">Raw operational stats for current year</span></div></div>
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">Weekly Health Report Template</span> <span class="migrate-tag to-tf">→ Teams when finalized</span><br><span class="file-desc">Template moves to Teams Files once stable</span></div></div>
+          </div>
+        </div>
+
+        <div class="folder-group">
+          <div class="folder-header" onclick="toggleFolder(this)">
+            <span class="folder-icon">👤</span>
+            <span class="folder-name">04 — Role & HR</span>
+            <span class="folder-count">7</span>
+            <span class="folder-chevron">▶</span>
+          </div>
+          <div class="folder-files">
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">Role Realignment Proposal</span><br><span class="file-desc">2017 classification vs. current responsibilities</span></div></div>
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">2017 vs. 2025 Comparison Matrix</span><br><span class="file-desc">Side-by-side role evolution data</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">Performance Check-In Spring 2025</span><br><span class="file-desc">Semi-annual review with Peer Fiss</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">Performance Check-In Fall 2024</span><br><span class="file-desc">Previous review cycle documentation</span></div></div>
+            <div class="file-item"><span class="file-icon">🌐</span><div><span class="file-name">Org Chart v4.3</span><br><span class="file-desc">Interactive HTML — current reporting structure</span></div></div>
+            <div class="file-item"><span class="file-icon">🌐</span><div><span class="file-name">FTE Workload Analysis</span><br><span class="file-desc">108% capacity documentation</span></div></div>
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">Staffing Model FY26</span><br><span class="file-desc">Headcount planning and projections</span></div></div>
+          </div>
+        </div>
+
+        <div class="folder-group">
+          <div class="folder-header" onclick="toggleFolder(this)">
+            <span class="folder-icon">🎯</span>
+            <span class="folder-name">05 — Strategic Planning</span>
+            <span class="folder-count">9</span>
+            <span class="folder-chevron">▶</span>
+          </div>
+          <div class="folder-files">
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">Strategic Plan FY26–FY27</span><br><span class="file-desc">Multi-year vision and operational goals</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">CORAL Project Proposal (CSCI 401)</span><br><span class="file-desc">Viterbi CS collaboration — platform spec</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">CORAL Implementation Plan</span><br><span class="file-desc">Deployment timeline and integration specs</span></div></div>
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">Peer Institution Benchmarking</span><br><span class="file-desc">Ross, McCombs, Vanderbilt comparisons</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">AI Strategy FY26</span><br><span class="file-desc">Claude, ChatGPT integration planning</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">Donor Sell Sheet Coordination</span><br><span class="file-desc">External Relations / Erica Keil materials</span></div></div>
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">B-Lab Network — Comparison Framework</span><br><span class="file-desc">Cross-institutional benchmarking data (Ross, McCombs, Vanderbilt, Foster)</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">B-Lab Network — Meeting Notes [Date]</span><br><span class="file-desc">Recurring coordination call notes and action items</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">B-Lab Network — Shared Frameworks</span><br><span class="file-desc">Best practice docs, templates exchanged with peer labs</span></div></div>
+          </div>
+        </div>
+
+        <div class="folder-group">
+          <div class="folder-header" onclick="toggleFolder(this)">
+            <span class="folder-icon">📋</span>
+            <span class="folder-name">06 — Meeting Prep</span>
+            <span class="folder-count">4</span>
+            <span class="folder-chevron">▶</span>
+          </div>
+          <div class="folder-files">
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">1:1 Agendas — Peer Fiss [Date]</span><br><span class="file-desc">Recurring meeting prep and notes</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">Advisory Committee [Date]</span><br><span class="file-desc">Committee meeting agendas and minutes</span></div></div>
+            <div class="file-item"><span class="file-icon">🌐</span><div><span class="file-name">Meeting Agenda October 2025</span><br><span class="file-desc">Interactive HTML agenda format</span></div></div>
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">Faculty Orientation Deck</span><br><span class="file-desc">Presentation for new faculty onboarding</span></div></div>
+          </div>
+        </div>
+
+        <div class="folder-group">
+          <div class="folder-header" onclick="toggleFolder(this)">
+            <span class="folder-icon">📣</span>
+            <span class="folder-name">07 — Communications & Outreach</span>
+            <span class="folder-count">6</span>
+            <span class="folder-chevron">▶</span>
+          </div>
+          <div class="folder-files">
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">Content Calendar</span><br><span class="file-desc">Monthly planning for LinkedIn, X/Twitter, newsletter, website</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">LinkedIn Post Drafts</span><br><span class="file-desc">Lab updates, achievements, research highlights — draft before publishing</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">Newsletter Copy [Month]</span><br><span class="file-desc">Monthly digest drafts — sent via Outlook distribution list (replaced Mailchimp)</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">Website Content Updates</span><br><span class="file-desc">External-facing website copy, page edits, resource links</span></div></div>
+            <div class="file-item"><span class="file-icon">📁</span><div><span class="file-name">Graphics & Media/</span><br><span class="file-desc">Canva exports, photos, infographics — staged here before publishing</span></div></div>
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">Outreach Metrics</span><br><span class="file-desc">Engagement tracking — LinkedIn impressions, newsletter open rates, website traffic</span></div></div>
+          </div>
+        </div>
+
+        <div class="folder-group">
+          <div class="folder-header" onclick="toggleFolder(this)">
+            <span class="folder-icon">🎓</span>
+            <span class="folder-name">08 — Course Operations (Planning)</span>
+            <span class="folder-count">4</span>
+            <span class="folder-chevron">▶</span>
+          </div>
+          <div class="folder-files">
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">Course Integration Strategy</span><br><span class="file-desc">BUAD 304, 307, 497 — semester planning, faculty coordination approach</span></div></div>
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">Participation Metrics by Course</span><br><span class="file-desc">Enrollment, completion rates, field study conversion — multi-semester trends</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">Faculty Talking Points & Slide Deck</span> <span class="migrate-tag to-sp">→ SharePoint when finalized</span><br><span class="file-desc">Presentation for in-class research participation overview</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">Field Study Redesign Notes</span><br><span class="file-desc">Prescreening improvements, contact collection optimization</span></div></div>
+          </div>
+        </div>
+
+        <div class="folder-group">
+          <div class="folder-header" onclick="toggleFolder(this)">
+            <span class="folder-icon">🔧</span>
+            <span class="folder-name">10 — Templates & Reference (Working)</span>
+            <span class="folder-count">4</span>
+            <span class="folder-chevron">▶</span>
+          </div>
+          <div class="folder-files">
+            <div class="file-item"><span class="file-icon">🌐</span><div><span class="file-name">Quick Start Checklist v3.4</span><br><span class="file-desc">Working copy — canonical in Teams/SharePoint</span></div></div>
+            <div class="file-item"><span class="file-icon">🌐</span><div><span class="file-name">Lab Door Signs</span><br><span class="file-desc">Working copy — print-ready versions</span></div></div>
+            <div class="file-item"><span class="file-icon">🌐</span><div><span class="file-name">Table of Contents</span><br><span class="file-desc">Master document index</span></div></div>
+            <div class="file-item"><span class="file-icon">🌐</span><div><span class="file-name">Timeline 2017–2025</span><br><span class="file-desc">Interactive lab history visualization</span></div></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ───── TEAMS FILES COLUMN ───── -->
+    <div class="col-panel">
+      <div class="col-header tf">
+        <div class="col-icon">💬</div>
+        <h2>Teams Files</h2>
+        <div class="col-subtitle">Shared Operations — Team Edits Daily</div>
+      </div>
+      <div class="col-body">
+
+        <div class="folder-group open">
+          <div class="folder-header" onclick="toggleFolder(this)">
+            <span class="folder-icon">📝</span>
+            <span class="folder-name">Templates</span>
+            <span class="folder-count">4</span>
+            <span class="folder-chevron">▶</span>
+          </div>
+          <div class="folder-files">
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">Auto-Reply Text</span><br><span class="file-desc">Standard auto-reply for all 5 mailboxes</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">Email Templates</span><br><span class="file-desc">Announcements, reminders, recruitment messages</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">MOR 3-Day Wave Reminders</span><br><span class="file-desc">Day 1 / Day 2 / Day 3 invite templates</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">"Awaiting Action" Follow-Up</span><br><span class="file-desc">Template for MKT 11pm deadline emails</span></div></div>
+          </div>
+        </div>
+
+        <div class="folder-group open">
+          <div class="folder-header" onclick="toggleFolder(this)">
+            <span class="folder-icon">📅</span>
+            <span class="folder-name">Schedules</span>
+            <span class="folder-count">3</span>
+            <span class="folder-chevron">▶</span>
+          </div>
+          <div class="folder-files">
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">RA Schedule Spreadsheet</span><br><span class="file-desc">Master RA assignments — cross-referenced with SONA every Monday</span></div></div>
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">Coverage Tracker</span><br><span class="file-desc">Shift coverage gaps and fill status</span></div></div>
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">Room Booking Reference</span><br><span class="file-desc">VPD LL102 / LL110 / LL112 availability overview</span></div></div>
+          </div>
+        </div>
+
+        <div class="folder-group open">
+          <div class="folder-header" onclick="toggleFolder(this)">
+            <span class="folder-icon">⏱️</span>
+            <span class="folder-name">Timesheets</span>
+            <span class="folder-count">2</span>
+            <span class="folder-chevron">▶</span>
+          </div>
+          <div class="folder-files">
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">Weekly Student Hour Logs</span><br><span class="file-desc">Excel timesheet — assistants log every Friday, LM forwards to Business Office</span></div></div>
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">Hours Summary — Historical</span><br><span class="file-desc">Cumulative hours tracking for PAA processing</span></div></div>
+          </div>
+        </div>
+
+        <div class="folder-group open">
+          <div class="folder-header" onclick="toggleFolder(this)">
+            <span class="folder-icon">📓</span>
+            <span class="folder-name">Log Book</span>
+            <span class="folder-count">2</span>
+            <span class="folder-chevron">▶</span>
+          </div>
+          <div class="folder-files">
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">Daily Operational Log</span><br><span class="file-desc">Running/finished/upcoming studies, quota status, daily entries by shift assistants</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">Weekly Study Health Reports</span><br><span class="file-desc">Friday 5pm submissions — quota summary, credit levels, no-show analysis</span></div></div>
+          </div>
+        </div>
+
+        <div class="folder-group">
+          <div class="folder-header" onclick="toggleFolder(this)">
+            <span class="folder-icon">🔄</span>
+            <span class="folder-name">Handoff Notes</span>
+            <span class="folder-count">1</span>
+            <span class="folder-chevron">▶</span>
+          </div>
+          <div class="folder-files">
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">Shift Transition Documents</span><br><span class="file-desc">End-of-shift handoff for incoming assistant — outstanding items, urgent flags</span></div></div>
+          </div>
+        </div>
+
+        <div class="folder-group">
+          <div class="folder-header" onclick="toggleFolder(this)">
+            <span class="folder-icon">🗒️</span>
+            <span class="folder-name">Meeting Notes</span>
+            <span class="folder-count">1</span>
+            <span class="folder-chevron">▶</span>
+          </div>
+          <div class="folder-files">
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">Team Meeting Agendas & Minutes</span><br><span class="file-desc">Internal team meetings — not faculty-facing</span></div></div>
+          </div>
+        </div>
+
+        <div class="folder-group">
+          <div class="folder-header" onclick="toggleFolder(this)">
+            <span class="folder-icon">🔬</span>
+            <span class="folder-name">Subject Pools & Research</span>
+            <span class="folder-count">4</span>
+            <span class="folder-chevron">▶</span>
+          </div>
+          <div class="folder-files">
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">Subject Pool Overview AY25–26</span><br><span class="file-desc">5 pools — enrollment, credit balances, quotas. Admin Lead &amp; Tech/Data Lead reference daily.</span></div></div>
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">Study Tracker FY25</span><br><span class="file-desc">Master list of all 60+ studies supported — status, PI, pool assignment</span></div></div>
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">Field Study Prescreening Template</span><br><span class="file-desc">MOR Field pool prescreening contact lists</span></div></div>
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">SONA Instructor Account Roster</span><br><span class="file-desc">Faculty accounts across all 3 SONA systems</span></div></div>
+          </div>
+        </div>
+
+        <div class="folder-group">
+          <div class="folder-header" onclick="toggleFolder(this)">
+            <span class="folder-icon">🏗️</span>
+            <span class="folder-name">Facilities & Equipment</span>
+            <span class="folder-count">3</span>
+            <span class="folder-chevron">▶</span>
+          </div>
+          <div class="folder-files">
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">Equipment Inventory</span><br><span class="file-desc">TOBII, BIOPAC, computers, iPads — Tech/Data Lead maintains</span></div></div>
+            <div class="file-item"><span class="file-icon">🌐</span><div><span class="file-name">Floor Plan Aug 2025</span><br><span class="file-desc">Lab layout — VPD LL102 / LL110 / LL112</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">VPD Service Requests Log</span><br><span class="file-desc">Facilities maintenance tracking</span></div></div>
+          </div>
+        </div>
+
+        <div class="folder-group">
+          <div class="folder-header" onclick="toggleFolder(this)">
+            <span class="folder-icon">👥</span>
+            <span class="folder-name">Student Assistant Pool</span>
+            <span class="folder-count">4</span>
+            <span class="folder-chevron">▶</span>
+          </div>
+          <div class="folder-files">
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">SA Roster AY25–26</span><br><span class="file-desc">All 37 students — skills, availability, contact info</span></div></div>
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">Recruitment Tracker AY25–26</span><br><span class="file-desc">198 applicants → 22 selected pipeline</span></div></div>
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">Skills Catalog</span><br><span class="file-desc">RA competency matrix for study matching</span></div></div>
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">Alumni Outcomes</span><br><span class="file-desc">Post-graduation tracking for impact reporting</span></div></div>
+          </div>
+        </div>
+
+        <div class="folder-group">
+          <div class="folder-header" onclick="toggleFolder(this)">
+            <span class="folder-icon">🎓</span>
+            <span class="folder-name">Course Operations (BUAD 304/307/497)</span>
+            <span class="folder-count">5</span>
+            <span class="folder-chevron">▶</span>
+          </div>
+          <div class="folder-files">
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">Roster Submissions [Semester]</span><br><span class="file-desc">Faculty-submitted enrollment rosters — imported into SONA</span></div></div>
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">Field Study Prescreening Tracker</span><br><span class="file-desc">MOR Field pool — employee/coworker/supervisor contact collection status</span></div></div>
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">Participation Tracker [Semester]</span><br><span class="file-desc">Credit completion status by course section — shared with faculty</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">Student Handouts (Current Semester)</span><br><span class="file-desc">Active versions of participation guides distributed to students</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">Faculty Instructions — Pool Enrollment</span><br><span class="file-desc">Step-by-step for instructors adding students to SONA pools</span></div></div>
+          </div>
+        </div>
+
+        <div class="folder-group">
+          <div class="folder-header" onclick="toggleFolder(this)">
+            <span class="folder-icon">🔄</span>
+            <span class="folder-name">Semester Transition</span>
+            <span class="folder-count">5</span>
+            <span class="folder-chevron">▶</span>
+          </div>
+          <div class="folder-files">
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">End-of-Semester Closeout Checklist</span><br><span class="file-desc">Archive studies, reconcile credits, close SONA sessions, final timesheets</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">Start-of-Semester Launch Checklist</span><br><span class="file-desc">Reset pools, import rosters, onboard new RAs, update templates, verify equipment</span></div></div>
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">SONA Pool Reset Log [Semester]</span><br><span class="file-desc">Credit balance carryover decisions, enrollment resets, pool configuration changes</span></div></div>
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">RA Turnover Tracker [Semester]</span><br><span class="file-desc">Departing vs. returning vs. new RAs — handoff assignments, training needs</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">Planner Task Rollover Notes</span><br><span class="file-desc">Carry-forward items, deferred projects, priority resets for new semester</span></div></div>
+          </div>
+        </div>
+
+        <div class="folder-group">
+          <div class="folder-header" onclick="toggleFolder(this)">
+            <span class="folder-icon">💼</span>
+            <span class="folder-name">Workday Outputs</span>
+            <span class="folder-count">3</span>
+            <span class="folder-chevron">▶</span>
+          </div>
+          <div class="folder-files">
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">Expense Reports — Exported</span><br><span class="file-desc">Workday expense report exports for budget reconciliation (feeds OneDrive budget tracker)</span></div></div>
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">Payroll Verification — Period [Date]</span><br><span class="file-desc">Cross-check Workday payroll against Teams timesheets — flag discrepancies to LM</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">ServiceNow PAA Transfer Confirmation</span><br><span class="file-desc">Monthly confirmation receipts from Josie Acosta — proof of wage transfer processing</span></div></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ───── SHAREPOINT COLUMN ───── -->
+    <div class="col-panel">
+      <div class="col-header sp">
+        <div class="col-icon">📚</div>
+        <h2>SharePoint Wiki</h2>
+        <div class="col-subtitle">Published Reference — Read-Only for Staff</div>
+      </div>
+      <div class="col-body">
+
+        <div class="folder-group open">
+          <div class="folder-header" onclick="toggleFolder(this)">
+            <span class="folder-icon">🔬</span>
+            <span class="folder-name">Study & Research Procedures</span>
+            <span class="folder-count">5</span>
+            <span class="folder-chevron">▶</span>
+          </div>
+          <div class="folder-files">
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">Study Setup Guide</span><br><span class="file-desc">End-to-end process for faculty requesting studies</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">Subject Pool Policies</span><br><span class="file-desc">Rules for all 5 pools — MKT, MOR, Field, Compensated, Third-Party</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">MOR 3-Day Wave Procedure</span><br><span class="file-desc">Step-by-step invite wave process</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">MKT "Awaiting Action" Procedure</span><br><span class="file-desc">11pm email → morning cancellation flow</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">Compensation Processing</span><br><span class="file-desc">Tremendous, Amazon Business, gift card procedures</span></div></div>
+          </div>
+        </div>
+
+        <div class="folder-group">
+          <div class="folder-header" onclick="toggleFolder(this)">
+            <span class="folder-icon">🖥️</span>
+            <span class="folder-name">SONA Administration</span>
+            <span class="folder-count">3</span>
+            <span class="folder-chevron">▶</span>
+          </div>
+          <div class="folder-files">
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">SONA Administration Manual</span><br><span class="file-desc">All 3 systems — timeslots, credits, configuration</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">SONA Troubleshooting Guide</span><br><span class="file-desc">Common issues and fixes across all 3 systems</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">SONA Instructor Account Reference</span><br><span class="file-desc">Faculty account setup and management across systems</span></div></div>
+          </div>
+        </div>
+
+        <div class="folder-group">
+          <div class="folder-header" onclick="toggleFolder(this)">
+            <span class="folder-icon">📧</span>
+            <span class="folder-name">Communication & Email Protocols</span>
+            <span class="folder-count">3</span>
+            <span class="folder-chevron">▶</span>
+          </div>
+          <div class="folder-files">
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">Email & Communication Protocols</span><br><span class="file-desc">Routing rules, response SLAs, escalation procedures</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">Auto-Reply Standards</span><br><span class="file-desc">Approved auto-reply text and activation procedures for all 5 mailboxes</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">Announcement & Recruitment Templates Reference</span><br><span class="file-desc">Standard templates for participant announcements and study recruitment</span></div></div>
+          </div>
+        </div>
+
+        <div class="folder-group">
+          <div class="folder-header" onclick="toggleFolder(this)">
+            <span class="folder-icon">🔧</span>
+            <span class="folder-name">Equipment & Facilities</span>
+            <span class="folder-count">3</span>
+            <span class="folder-chevron">▶</span>
+          </div>
+          <div class="folder-files">
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">Equipment Operating Guides</span><br><span class="file-desc">TOBII eye tracking, BIOPAC setup, room technology</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">Lab Usage Policies</span><br><span class="file-desc">Room booking, equipment checkout, scheduling rules</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">Tech Support Guide</span><br><span class="file-desc">Equipment issues, software errors, escalation paths</span></div></div>
+          </div>
+        </div>
+
+        <div class="folder-group">
+          <div class="folder-header" onclick="toggleFolder(this)">
+            <span class="folder-icon">👋</span>
+            <span class="folder-name">New Staff Orientation</span>
+            <span class="folder-count">4</span>
+            <span class="folder-chevron">▶</span>
+          </div>
+          <div class="folder-files">
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">New RA Onboarding Guide</span><br><span class="file-desc">Complete orientation — reduced onboarding ~40% (3hr → &lt;2hr)</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">New Assistant Orientation</span><br><span class="file-desc">Administrative assistant onboarding checklist and expectations</span></div></div>
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">Orientation Slide Deck</span><br><span class="file-desc">Presentation for new staff — finalized version</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">CITI Training Requirements</span> <span class="migrate-tag to-sp">↔ linked from Compliance & IRB</span><br><span class="file-desc">IRB compliance and certification guide — home is in Compliance, linked here for onboarding</span></div></div>
+          </div>
+        </div>
+
+        <div class="folder-group">
+          <div class="folder-header" onclick="toggleFolder(this)">
+            <span class="folder-icon">📜</span>
+            <span class="folder-name">Policies & Code of Conduct</span>
+            <span class="folder-count">3</span>
+            <span class="folder-chevron">▶</span>
+          </div>
+          <div class="folder-files">
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">No-Show & Cancellation Policy</span><br><span class="file-desc">Participant no-show handling and related procedures</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">RA Code of Conduct</span><br><span class="file-desc">Student assistant expectations and responsibilities</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">Student Handouts</span><br><span class="file-desc">Participant-facing instructions and guides</span></div></div>
+          </div>
+        </div>
+
+        <div class="folder-group">
+          <div class="folder-header" onclick="toggleFolder(this)">
+            <span class="folder-icon">✅</span>
+            <span class="folder-name">Compliance & IRB</span>
+            <span class="folder-count">4</span>
+            <span class="folder-chevron">▶</span>
+          </div>
+          <div class="folder-files">
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">IRB Protocol Templates</span><br><span class="file-desc">Standard templates for study submissions</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">Compliance Checklist</span><br><span class="file-desc">IRB verification steps for active studies</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">Data Handling Policies</span><br><span class="file-desc">Participant data, storage, and privacy procedures</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">CITI Training Requirements</span><br><span class="file-desc">IRB compliance and certification guide — canonical home</span></div></div>
+          </div>
+        </div>
+
+        <div class="folder-group">
+          <div class="folder-header" onclick="toggleFolder(this)">
+            <span class="folder-icon">🎓</span>
+            <span class="folder-name">Course & Instructional Guides</span>
+            <span class="folder-count">4</span>
+            <span class="folder-chevron">▶</span>
+          </div>
+          <div class="folder-files">
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">BUAD 304/307/497 — Subject Pool Guide</span><br><span class="file-desc">How course-based participation works — for faculty reference</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">Student Participation Handout (Template)</span> <span class="migrate-tag to-tf">→ active copy in Teams</span><br><span class="file-desc">Finalized template — working copies distributed each semester via Teams</span></div></div>
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">Course Slide Deck (Final)</span> <span class="migrate-tag to-od">← drafted in OneDrive</span><br><span class="file-desc">In-class presentation about research participation benefits</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">Field Study Prescreening SOP</span><br><span class="file-desc">Contact collection procedure, 88% completion rate methodology</span></div></div>
+          </div>
+        </div>
+
+        <div class="folder-group">
+          <div class="folder-header" onclick="toggleFolder(this)">
+            <span class="folder-icon">❓</span>
+            <span class="folder-name">FAQ & Quick Reference</span>
+            <span class="folder-count">2</span>
+            <span class="folder-chevron">▶</span>
+          </div>
+          <div class="folder-files">
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">Student FAQ</span><br><span class="file-desc">Common participant questions and standard answers</span></div></div>
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">Faculty FAQ</span><br><span class="file-desc">Common researcher questions about lab services</span></div></div>
+          </div>
+        </div>
+
+        <div class="folder-group">
+          <div class="folder-header" onclick="toggleFolder(this)">
+            <span class="folder-icon">⚙️</span>
+            <span class="folder-name">Operations & Systems Documentation</span>
+            <span class="folder-count">3</span>
+            <span class="folder-chevron">▶</span>
+          </div>
+          <div class="folder-files">
+            <div class="file-item"><span class="file-icon">🌐</span><div><span class="file-name">MBRL Operations & Workflow Hub</span><br><span class="file-desc">Communications, study lifecycle, daily operations, team roles, escalation, checklists</span></div></div>
+            <div class="file-item"><span class="file-icon">🌐</span><div><span class="file-name">Microsoft 365 Ecosystem Guide</span><br><span class="file-desc">Platform roles, workflows, audience map, permissions, design principles</span></div></div>
+            <div class="file-item"><span class="file-icon">🌐</span><div><span class="file-name">File Placement Map</span><br><span class="file-desc">Three-column map of OneDrive vs. Teams Files vs. SharePoint with decision tree</span></div></div>
+          </div>
+        </div>
+
+        <div class="folder-group">
+          <div class="folder-header" onclick="toggleFolder(this)">
+            <span class="folder-icon">📊</span>
+            <span class="folder-name">Published Reports</span>
+            <span class="folder-count">3</span>
+            <span class="folder-chevron">▶</span>
+          </div>
+          <div class="folder-files">
+            <div class="file-item"><span class="file-icon">📄</span><div><span class="file-name">Annual Report (Final)</span> <span class="migrate-tag to-od">← drafted in OneDrive</span><br><span class="file-desc">Finalized version — moved here when published</span></div></div>
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">KPI Dashboard (Final)</span> <span class="migrate-tag to-od">← drafted in OneDrive</span><br><span class="file-desc">Published performance metrics</span></div></div>
+            <div class="file-item"><span class="file-icon">📊</span><div><span class="file-name">8-Year Impact Programs Report</span><br><span class="file-desc">Historical growth and impact documentation</span></div></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════════ MIGRATION FLOWS ════════════════ -->
+<section class="migration-section">
+  <div class="section-label">File Migration Paths — When Files Move Between Platforms</div>
+  <table class="migration-table">
+    <thead>
+      <tr>
+        <th>File</th>
+        <th>Starts In</th>
+        <th></th>
+        <th>Moves To</th>
+        <th>Trigger</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Annual Report</td>
+        <td><span class="origin-badge od">OneDrive</span></td>
+        <td class="arrow-cell">→</td>
+        <td><span class="dest-badge sp">SharePoint</span> + <span class="dest-badge out">Outlook link</span></td>
+        <td>Final draft approved by Peer Fiss</td>
+      </tr>
+      <tr>
+        <td>KPI Dashboard</td>
+        <td><span class="origin-badge od">OneDrive</span></td>
+        <td class="arrow-cell">→</td>
+        <td><span class="dest-badge sp">SharePoint</span></td>
+        <td>End-of-year metrics finalized</td>
+      </tr>
+      <tr>
+        <td>Weekly Health Report Template</td>
+        <td><span class="origin-badge od">OneDrive</span></td>
+        <td class="arrow-cell">→</td>
+        <td><span class="dest-badge tf">Teams Files</span></td>
+        <td>Template stabilized — assistants use weekly</td>
+      </tr>
+      <tr>
+        <td>Budget Operating Plan</td>
+        <td><span class="origin-badge od">OneDrive</span></td>
+        <td class="arrow-cell">→</td>
+        <td><span class="dest-badge out">Outlook link to Peer</span></td>
+        <td>Ready for supervisor review — shared as link, not moved</td>
+      </tr>
+      <tr>
+        <td>New SOP (any)</td>
+        <td><span class="origin-badge od">OneDrive</span></td>
+        <td class="arrow-cell">→</td>
+        <td><span class="dest-badge sp">SharePoint Wiki</span></td>
+        <td>Procedure finalized and ready for staff reference</td>
+      </tr>
+      <tr>
+        <td>Faculty Orientation Deck</td>
+        <td><span class="origin-badge od">OneDrive</span></td>
+        <td class="arrow-cell">→</td>
+        <td><span class="dest-badge sp">SharePoint</span></td>
+        <td>Presentation finalized for semester</td>
+      </tr>
+      <tr>
+        <td>Email Template (updated)</td>
+        <td><span class="origin-badge od">OneDrive</span></td>
+        <td class="arrow-cell">→</td>
+        <td><span class="dest-badge tf">Teams Files</span></td>
+        <td>Lab Manager revises template, pushes to Teams for team use</td>
+      </tr>
+      <tr>
+        <td>Student Hours Timesheet</td>
+        <td><span class="origin-badge tf">Teams Files</span></td>
+        <td class="arrow-cell">→</td>
+        <td><span class="dest-badge out">Outlook to Business Office</span></td>
+        <td>Friday weekly submission by Lab Manager</td>
+      </tr>
+      <tr>
+        <td>Role Realignment Proposal</td>
+        <td><span class="origin-badge od">OneDrive</span></td>
+        <td class="arrow-cell">→</td>
+        <td><span class="dest-badge out">Outlook link to Peer</span></td>
+        <td>Discussion-ready — shared via link, never moved</td>
+      </tr>
+      <tr>
+        <td>Course Slide Deck</td>
+        <td><span class="origin-badge od">OneDrive</span></td>
+        <td class="arrow-cell">→</td>
+        <td><span class="dest-badge sp">SharePoint</span></td>
+        <td>Finalized for semester — published as reference for faculty</td>
+      </tr>
+      <tr>
+        <td>Student Handouts (active copy)</td>
+        <td><span class="origin-badge sp">SharePoint</span></td>
+        <td class="arrow-cell">→</td>
+        <td><span class="dest-badge tf">Teams Files</span></td>
+        <td>Each semester — finalized template copied to Course Ops for active distribution</td>
+      </tr>
+      <tr>
+        <td>Roster Submissions</td>
+        <td><span class="origin-badge out">Outlook (from faculty)</span></td>
+        <td class="arrow-cell">→</td>
+        <td><span class="dest-badge tf">Teams Files</span></td>
+        <td>Faculty email rosters to Lab Manager → saved in Course Operations folder</td>
+      </tr>
+      <tr>
+        <td>Workday Expense Exports</td>
+        <td><span class="origin-badge out">Workday</span></td>
+        <td class="arrow-cell">→</td>
+        <td><span class="dest-badge tf">Teams Files</span> → <span class="dest-badge od">OneDrive</span></td>
+        <td>Exported from Workday → Teams for reference → feeds OneDrive budget tracker</td>
+      </tr>
+      <tr>
+        <td>Newsletter Draft</td>
+        <td><span class="origin-badge od">OneDrive</span></td>
+        <td class="arrow-cell">→</td>
+        <td><span class="dest-badge out">Outlook distribution list</span></td>
+        <td>Draft finalized → sent via Outlook (replaced Mailchimp)</td>
+      </tr>
+      <tr>
+        <td>Semester Closeout Checklist</td>
+        <td><span class="origin-badge tf">Teams Files</span></td>
+        <td class="arrow-cell">→</td>
+        <td><span class="dest-badge tf">Teams Files (archived copy)</span></td>
+        <td>Completed checklist archived at semester end, fresh copy for new semester</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ════════════════ RULES ════════════════ -->
+<section class="rules-section">
+  <div class="section-label">Placement Rules — Six Laws of File Governance</div>
+  <div class="rules-grid">
+    <div class="rule-card r-all">
+      <div class="rule-number">Rule 01</div>
+      <div class="rule-title">One Home Per File</div>
+      <div class="rule-desc">Every file resides in exactly one location. Link to it from other platforms rather than copying. If the same file exists in two locations, one copy should be removed.</div>
+    </div>
+    <div class="rule-card r-od">
+      <div class="rule-number">Rule 02</div>
+      <div class="rule-title">OneDrive Is for Active Drafts, Not Long-Term Storage</div>
+      <div class="rule-desc">Files in OneDrive are in progress — drafts, iterative documents, and active development. Once finalized, they migrate to SharePoint for reference, to Teams for team use, or are shared via Outlook link.</div>
+    </div>
+    <div class="rule-card r-tf">
+      <div class="rule-number">Rule 03</div>
+      <div class="rule-title">If the Team Needs It Daily, It Belongs in Teams Files</div>
+      <div class="rule-desc">Timesheets, schedules, log books, templates, handoff notes — anything an assistant touches during a shift. Collaborative from birth. No OneDrive detour needed.</div>
+    </div>
+    <div class="rule-card r-sp">
+      <div class="rule-number">Rule 04</div>
+      <div class="rule-title">SharePoint Is the Library, Not the Workshop</div>
+      <div class="rule-desc">Finalized SOPs, onboarding guides, training materials, compliance docs. Read-only for staff. Only the Lab Manager publishes. Version control and SOP integrity depend on this boundary.</div>
+    </div>
+    <div class="rule-card r-od">
+      <div class="rule-number">Rule 05</div>
+      <div class="rule-title">The Continuity Check</div>
+      <div class="rule-desc">If a colleague would need this file to perform their duties in your absence, it should not remain in personal OneDrive as its permanent home. Move it to Teams Files or SharePoint.</div>
+    </div>
+    <div class="rule-card r-all">
+      <div class="rule-number">Rule 06</div>
+      <div class="rule-title">Share via Link, Not Attachment</div>
+      <div class="rule-desc">When sharing files externally via Outlook, send a OneDrive or SharePoint link — not an attachment. This preserves version control and prevents outdated copies from circulating.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ CHEAT SHEET ════════════════ -->
+<section class="cheat-section">
+  <div class="section-label">Quick Reference — Common Scenarios</div>
+  <div class="cheat-grid">
+    <div class="cheat-card">
+      <h3>🤔 "Where do I save this?"</h3>
+      <div class="cheat-item"><span class="cheat-icon">💰</span><div class="cheat-text"><strong>Budget draft</strong> → OneDrive / 01 Budget</div></div>
+      <div class="cheat-item"><span class="cheat-icon">📊</span><div class="cheat-text"><strong>RA schedule update</strong> → Teams Files / Schedules</div></div>
+      <div class="cheat-item"><span class="cheat-icon">📄</span><div class="cheat-text"><strong>New SOP</strong> → Draft in OneDrive → Publish to SharePoint</div></div>
+      <div class="cheat-item"><span class="cheat-icon">⏱️</span><div class="cheat-text"><strong>Weekly timesheet</strong> → Teams Files / Timesheets</div></div>
+      <div class="cheat-item"><span class="cheat-icon">📝</span><div class="cheat-text"><strong>Meeting agenda for Peer</strong> → OneDrive / 06 Meeting Prep</div></div>
+      <div class="cheat-item"><span class="cheat-icon">📓</span><div class="cheat-text"><strong>Daily log entry</strong> → Teams Files / Log Book</div></div>
+      <div class="cheat-item"><span class="cheat-icon">📋</span><div class="cheat-text"><strong>Performance review prep</strong> → OneDrive / 04 Role & HR</div></div>
+      <div class="cheat-item"><span class="cheat-icon">📄</span><div class="cheat-text"><strong>Email template update</strong> → Revise in OneDrive → Push to Teams Files / Templates</div></div>
+      <div class="cheat-item"><span class="cheat-icon">📣</span><div class="cheat-text"><strong>LinkedIn post draft</strong> → OneDrive / 07 Communications & Outreach</div></div>
+      <div class="cheat-item"><span class="cheat-icon">🎓</span><div class="cheat-text"><strong>BUAD 304 roster from faculty</strong> → Teams Files / Course Operations</div></div>
+      <div class="cheat-item"><span class="cheat-icon">🔄</span><div class="cheat-text"><strong>End-of-semester closeout</strong> → Teams Files / Semester Transition</div></div>
+      <div class="cheat-item"><span class="cheat-icon">💼</span><div class="cheat-text"><strong>Workday expense export</strong> → Teams Files / Workday Outputs → feeds OneDrive budget</div></div>
+      <div class="cheat-item"><span class="cheat-icon">🌐</span><div class="cheat-text"><strong>B-Lab benchmarking notes</strong> → OneDrive / 05 Strategic Planning</div></div>
+    </div>
+    <div class="cheat-card">
+      <h3>⚠️ Common Mistakes to Avoid</h3>
+      <div class="cheat-item"><span class="cheat-icon">🚫</span><div class="cheat-text"><strong>Saving RA schedules in OneDrive</strong> — The team references these daily. RA schedules belong in Teams Files from the start.</div></div>
+      <div class="cheat-item"><span class="cheat-icon">🚫</span><div class="cheat-text"><strong>Editing SOPs in Teams Files</strong> — SOPs are published to SharePoint only. Draft edits happen in OneDrive.</div></div>
+      <div class="cheat-item"><span class="cheat-icon">🚫</span><div class="cheat-text"><strong>Duplicating files across platforms</strong> — One home. Always. Link from everywhere else.</div></div>
+      <div class="cheat-item"><span class="cheat-icon">🚫</span><div class="cheat-text"><strong>Emailing file attachments</strong> — Send OneDrive/SharePoint links via Outlook instead.</div></div>
+      <div class="cheat-item"><span class="cheat-icon">🚫</span><div class="cheat-text"><strong>Leaving finalized reports in OneDrive</strong> — Once approved, the final version migrates to SharePoint.</div></div>
+      <div class="cheat-item"><span class="cheat-icon">🚫</span><div class="cheat-text"><strong>Letting assistants edit SharePoint</strong> — SharePoint is read-only for staff. Only Lab Manager publishes.</div></div>
+      <div class="cheat-item"><span class="cheat-icon">🚫</span><div class="cheat-text"><strong>Using Calendly for scheduling</strong> — Deprecated. All scheduling now goes through Outlook Calendar (Behavioral Lab Calendar). Remove any lingering Calendly links.</div></div>
+      <div class="cheat-item"><span class="cheat-icon">🚫</span><div class="cheat-text"><strong>Putting internal files on Google Drive</strong> — Google Suite is restricted to student-interfacing use only. All internal operations, SOPs, schedules, and reference material live in M365. Nothing goes to Google without explicit Lab Manager approval.</div></div>
+      <div class="cheat-item"><span class="cheat-icon">🚫</span><div class="cheat-text"><strong>Using Google Calendar or Doodle</strong> — Outlook Calendar is the exclusive scheduling authority. No third-party scheduling tools are authorized.</div></div>
+      <div class="cheat-item"><span class="cheat-icon">🚫</span><div class="cheat-text"><strong>Keeping Workday exports only in Workday</strong> — Export to Teams Files / Workday Outputs so budget reconciliation has a paper trail in M365.</div></div>
+      <div class="cheat-item"><span class="cheat-icon">🚫</span><div class="cheat-text"><strong>Storing course rosters in personal email</strong> — Faculty-submitted rosters should be saved to Teams Files / Course Operations, not retained only in individual email inboxes.</div></div>
+    </div>
+  </div>
+</section>
+
+<div style="text-align:center; padding: 1.5rem; font-size: 0.72rem; color: var(--text-light);">
+  MBRL File Placement Map · Marshall Behavioral Research Lab · USC Marshall School of Business · Updated February 2026
+</div>
+
+<script>
+function toggleFolder(el) {
+  const group = el.closest('.folder-group');
+  group.classList.toggle('open');
+}
+</script>
+
+</body>
+</html>
